@@ -125,46 +125,57 @@ var Board = (function($) {
     } 
 
     sentence = sentence.split(".")
+      .filter(function(sentence) {
+        return sentence.length > 0;
+      })
       .map(function(sentence) {
         var wordsToBeIconed = Object.keys(icons);
         var iconStartIndex;
         var iconedSentence;
 
         wordsToBeIconed.forEach(function(wordToBeIconed) {
-          iconStartIndex = calculateIconStartIndex(sentence, wordToBeIconed);
+          if (sentence.indexOf(wordToBeIconed) > -1) {
+            iconStartIndex = calculateIconStartIndex(sentence, wordToBeIconed);
 
-          iconedSentence = sentence.substring(0, iconStartIndex) +
-                           iconsSpanTag[wordToBeIconed] + 
+            iconedSentence = sentence.substring(0, iconStartIndex) +
+                           " " + iconsSpanTag[wordToBeIconed] + 
                            sentence.substring(iconStartIndex);
 
-          if (((sentence.search('hot') > -1) && 
-              (sentence.search('fiery hot') > -1)) ||
-              ((sentence.search('cold') > -1) &&
-              (sentence.search('ice cold') > -1))) {
-            iconedSentence = sentence.substring(0, iconStartIndex) + 
-                             iconsSpanTag[wordToBeIconed] +
-                             iconsSpanTag[wordToBeIconed] +
-                             sentence.substring(iconStartIndex);
+
+            if (((sentence.search('hot') > -1) && 
+                (sentence.search('fiery hot') > -1)) ||
+                ((sentence.search('cold') > -1) &&
+                (sentence.search('ice cold') > -1))) {
+              iconedSentence = sentence.substring(0, iconStartIndex) + 
+                               " " +iconsSpanTag[wordToBeIconed] +
+                               iconsSpanTag[wordToBeIconed] +
+                               sentence.substring(iconStartIndex);
+            }
           }
+         
         });
 
         return iconedSentence;
       })
-      .join(".");
+      .join(".") + ".";
 
     return sentence;
   };
 
   var renderSummary = function(description, guessCountLeft, guessCountSoFar) {
-    var description = addTemperatureAndAltitudeIconToSentence(result.description);
-    var guessLeft = "You have " + guessCountLeft + "counts left.";
+    var descriptionWithIcons = addTemperatureAndAltitudeIconToSentence(description);
+    var guessLeft = "You have " + guessCountLeft + " counts left.";
     var guessSoFar = guessCountSoFar + " counts so far.";
 
-    return description + guessLeft + guessSoFar;
+    return descriptionWithIcons + " " + guessLeft + " " + guessSoFar;
   };
 
   Board.prototype.renderSummary = function(description, guessCountLeft, guessCountSoFar) {
-    dom['summary'].html(renderSummary(description, guessCountLeft, guessCountSoFar));
+    if (description === 'You win!') {
+      dom['summary'].html(description + " Click Replay to play again!");
+    } else {
+      dom['summary'].html(renderSummary(description, guessCountLeft, guessCountSoFar));
+    }
   };
 
   return Board;
