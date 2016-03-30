@@ -10,9 +10,3 @@ This is a small game made entirely using JavaScript, HTML & CSS.
 * The user cannot repeat the same guess number
 * You can use [Twitter Bootstrap](http://getbootstrap.com/) and [jQuery](http://jquery.com/) to help you, but not necessary
 * To help with your development process, you can use [Testem](https://github.com/testem/testem) to do Test Driven Development just like in previous projects, but not necessary
-
-# Instructions
-* you might need to do `npm install -g testem` or `sudo npm install -g testem`
-* make sure you are in this root `solution` directory
-* run the command `testem` and see all the test passes
-* open `index.html` and play the game
