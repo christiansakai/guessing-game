@@ -41,37 +41,17 @@ describe("Board", function() {
             "</div>";
 
       spyOn($.prototype, 'append');
+      spyOn($.prototype, 'find');
 
-      board.mountBoard();
+      board.setupBoard();
       
       expect($.prototype.append).toHaveBeenCalledWith(renderedHead);
       expect($.prototype.append).toHaveBeenCalledWith(renderedBody);
-  });
-
-  it('initialize selectors', function() {
-    board = new Board('game-board', 3);
-
-    spyOn($.fn, 'init');
-
-    board.initializeSelectors();
-
-    expect($.fn.init).toHaveBeenCalledWith('#game-hint', undefined);
-    expect($.fn.init).toHaveBeenCalledWith('#game-replay', undefined);
-    expect($.fn.init).toHaveBeenCalledWith('#game-input', undefined);
-    expect($.fn.init).toHaveBeenCalledWith('#game-summary', undefined);
-    expect($.fn.init).toHaveBeenCalledWith('#game-guess', undefined);
-  });
-
-  it('sets up board', function() {
-    board = new Board('game-board', 4);
-
-    spyOn(board, 'mountBoard');
-    spyOn(board, 'initializeSelectors');
-
-    board.setupBoard();
-
-    expect(board.mountBoard).toHaveBeenCalled();
-    expect(board.initializeSelectors).toHaveBeenCalled();
+      expect($.prototype.find).toHaveBeenCalledWith('#game-hint');
+      expect($.prototype.find).toHaveBeenCalledWith('#game-replay');
+      expect($.prototype.find).toHaveBeenCalledWith('#game-input');
+      expect($.prototype.find).toHaveBeenCalledWith('#game-summary');
+      expect($.prototype.find).toHaveBeenCalledWith('#game-guess');
   });
 
   it('disable controls', function() {
@@ -90,6 +70,8 @@ describe("Board", function() {
 
   it("listen for events", function() {
     board = new Board('game-board', 3);
+    board.setupBoard();
+
     var hintSpy = jasmine.createSpy('hint');
     var replaySpy = jasmine.createSpy('replay');
     var inputSpy = jasmine.createSpy('input');
@@ -114,7 +96,8 @@ describe("Board", function() {
 
   describe('Summary', function() {
     beforeEach(function() {
-      board = new Board('#game-board', 5);
+      board = new Board('game-board', 5);
+      board.setupBoard();
       
       spyOn($.fn, 'html');
     });
@@ -188,18 +171,38 @@ describe("Board", function() {
 
       expect($.fn.html).toHaveBeenCalledWith(expectedHTML);
     });
+  });
+
+  describe('Other Renderer', function() {
+    beforeEach(function() {
+       board = new Board('game-board', 5);
+       board.setupBoard();
+       
+       spyOn($.fn, 'html');
+    });
+
+    it('renders error', function() {
+      board.renderError("This is an error!");
+
+      expect($.fn.html).toHaveBeenCalledWith("This is an error!");
+    });
 
     it('renders when win', function() {
-      var description = 'You win!';
-      var guessCountLeft = 1;
-      var guessCountSoFar = 4;
+      board.renderWin();
 
-      board.renderSummary(description, guessCountLeft, guessCountSoFar);
+      var expectedHTML = "You win! Click Replay to play again!";
 
-    var expectedHTML = "You win! Click Replay to play again!";
+      expect($.fn.html).toHaveBeenCalledWith(expectedHTML);
+    });
+
+    it('renders lose', function() {
+      board.renderLose(7);
+
+      var expectedHTML = "You lose! The answer is 7. Click Replay to play again!";
 
       expect($.fn.html).toHaveBeenCalledWith(expectedHTML);
     });
   });
+
 });
 

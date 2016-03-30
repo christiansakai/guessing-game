@@ -2,7 +2,7 @@
     "framework": "jasmine2",
     "src_files": [
       "http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js",
-      "board.js",
-      "boardSpec.js"
+      "js/game.js",
+      "js/gameSpec.js"
     ]
 }

@@ -1,5 +1,8 @@
 var Board = (function($) {
   var Board = function(boardId, maxGuessCount) {
+    var dom = {};
+    var boardElement;
+
     this.getBoardId = function() {
       return boardId;
     };
@@ -7,10 +10,81 @@ var Board = (function($) {
     this.getMaxGuessCount = function() {
       return maxGuessCount;
     };
+
+    this.setupBoard = function() {
+      mountBoard();
+      initializeSelectors();
+    };
+
+    this.listenToEvents = function(actions) {
+      dom['hint'].on('click', function() {
+        actions.hint();
+      });
+
+      dom['replay'].on('click', function() {
+        actions.replay();
+      });
+
+      dom['input'].keypress(function(e) {
+        if (e.which === 13 &&
+            e.currentTarget.value) {
+          e.preventDefault();
+          actions.guess(parseInt(e.currentTarget.value));
+        }
+      });
+
+      dom['guess'].on('click', function(e) {
+        e.preventDefault();
+        if (dom['input'].val()) {
+          actions.guess(parseInt(dom['input'].val()));
+        }
+      });
+    };
+
+    this.disableControls = function() {
+      dom['input'].prop('disabled', true);
+      dom['guess'].prop('disabled', true);
+      dom['hint'].prop('disabled', true);
+    };
+
+    this.renderSummary = function(description, guessCountLeft, guessCountSoFar) {
+      dom['summary'].html(renderSummary(description, guessCountLeft, guessCountSoFar));
+    };
+
+    this.renderError = function(error) {
+      dom['summary'].html(error);
+    };
+
+    this.renderWin = function() {
+      dom['summary'].html(renderWin());
+    };
+
+    this.renderLose = function(answer) {
+      dom['summary'].html(renderLose(answer));
+    };
+
+    var mountBoard = (function() {
+      boardElement = $('#' + this.getBoardId());
+      var header = renderHeader();
+      var body = renderBody(this.getMaxGuessCount());
+
+      boardElement.append(header);
+      boardElement.append(body);
+    }).bind(this);
+
+    function initializeSelectors() {
+      dom = {
+        'hint': boardElement.find('#game-hint'),
+        'replay': boardElement.find('#game-replay'),
+        'input': boardElement.find('#game-input'),
+        'summary': boardElement.find('#game-summary'),
+        'guess': boardElement.find('#game-guess')
+      };
+    }
   };
 
-  // Original Renderer
-  var renderHeader = function() {
+  // Helper
+  function renderHeader() {
     return "<div class='row'>" +
               "<div class='col-xs-7 col-md-8'>" +
                 "<h2 class='text-center title game-title'>" +
@@ -24,9 +98,9 @@ var Board = (function($) {
                 "</div>" +
               "</div>" +
             "</div>";
-  };
+  }
 
-  var renderBody = function(maxGuessCount) {
+  function renderBody(maxGuessCount) {
     return "<div class='row'>" +
               "<form class='col-xs-12'>" + 
                 "<div class='form-group'>" +
@@ -41,73 +115,15 @@ var Board = (function($) {
                 "</div>" +
               "</form>" +
             "</div>";
-  };
-
-  Board.prototype.mountBoard = function() {
-    var boardElement = $('#' + this.getBoardId());
-    var header = renderHeader();
-    var body = renderBody(this.getMaxGuessCount());
-
-    boardElement.append(header);
-    boardElement.append(body);
-  };
-
-  // Event Handler Setup
-  var dom;
-  
-  Board.prototype.initializeSelectors = function() {
-    dom = {
-      'hint': $('#game-hint'),
-      'replay': $('#game-replay'),
-      'input': $('#game-input'),
-      'summary': $('#game-summary'),
-      'guess': $('#game-guess')
-    };
-  };
-
-  Board.prototype.setupBoard = function() {
-    this.mountBoard();
-    this.initializeSelectors();
-  };
-
-  Board.prototype.disableControls = function() {
-    dom['input'].prop('disabled', true);
-    dom['guess'].prop('disabled', true);
-    dom['hint'].prop('disabled', true);
-  };
-
-  Board.prototype.listenToEvents = function(actions) {
-    dom['hint'].on('click', function() {
-      actions.hint();
-    });
-
-    dom['replay'].on('click', function() {
-      actions.replay();
-    });
-
-    dom['input'].keypress(function(e) {
-      if (e.which === 13 &&
-          e.currentTarget.value) {
-        e.preventDefault();
-        actions.guess(parseInt(e.currentTarget.value));
-      }
-    });
-
-    dom['guess'].on('click', function(e) {
-      e.preventDefault();
-      if (dom['input'].val()) {
-        actions.guess(parseInt(dom['input'].val()));
-      }
-    });
-  };
+  }
 
   function calculateIconStartIndex(sentence, word) {
     var wordIndex = sentence.search(word);
     
     return wordIndex + word.length;
-  };
+  }
 
-  var addTemperatureAndAltitudeIconToSentence = function(sentence) {
+  function addTemperatureAndAltitudeIconToSentence(sentence) {
     var icons = {
       hot: 'fire',
       cold: 'ice-lolly',
@@ -160,23 +176,23 @@ var Board = (function($) {
       .join(".") + ".";
 
     return sentence;
-  };
+  }
 
-  var renderSummary = function(description, guessCountLeft, guessCountSoFar) {
+  function renderSummary(description, guessCountLeft, guessCountSoFar) {
     var descriptionWithIcons = addTemperatureAndAltitudeIconToSentence(description);
     var guessLeft = "You have " + guessCountLeft + " counts left.";
     var guessSoFar = guessCountSoFar + " counts so far.";
 
     return descriptionWithIcons + " " + guessLeft + " " + guessSoFar;
-  };
+  }
 
-  Board.prototype.renderSummary = function(description, guessCountLeft, guessCountSoFar) {
-    if (description === 'You win!') {
-      dom['summary'].html(description + " Click Replay to play again!");
-    } else {
-      dom['summary'].html(renderSummary(description, guessCountLeft, guessCountSoFar));
-    }
-  };
+  function renderLose(answer) {
+    return "You lose! The answer is " + answer + ". Click Replay to play again!";
+  }
+
+  function renderWin() {
+    return "You win! Click Replay to play again!";
+  }
 
   return Board;
 })(jQuery);

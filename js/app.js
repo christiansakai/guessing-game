@@ -25,12 +25,37 @@ $(document).ready(function() {
 
   startGame();
 
-  var actions = {
-    replay: startGame,
-    guess: hotCold.guess.bind(hotCold)
-  };
+  function guess(value) {
+    var guessSummary;
 
-  view.listenToEvents(actions);
+    try {
+      guessSummary = hotCold.guess(value);
+    } catch (e) {
+      return view.renderError(e);
+    }
+
+    if (hotCold.getWinLose() === 'win') {
+      view.renderWin();
+      return view.disableControls();
+    }
+
+    if (hotCold.getWinLose() === 'lose') {
+      view.renderLose(hotCold.getSecretNumber());
+      return view.disableControls();
+    }
+  }
+
+  function hint() {
+    view.renderLose(hotCold.surrender());
+
+    view.disableControls();
+  }
+
+  view.listenToEvents({
+    replay: startGame,
+    guess: guess,
+    hint: hint
+  });
 
 
 

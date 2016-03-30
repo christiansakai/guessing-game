@@ -3,8 +3,9 @@ var Game = (function() {
   // Model
   var Game = function(secretNumber, maxGuessCount) {
     var userGuessHistory = [];
-    var win = false;
+    var winLose;
     
+    // Getters
     this.getSecretNumber = function() {
       return secretNumber;
     };
@@ -18,22 +19,75 @@ var Game = (function() {
         return {
           value: guess.value,
           description: guess.description,
-          correct: guess.correct,
-          temperature: guess.temperature
+          correct: guess.correct
         };
       }); 
     };
 
-    this.getWin = function() {
-      return win;
+    this.getWinLose = function() {
+      return winLose;
     };
 
-    this.guessLeft = function() {
-      return maxGuessCount - userGuessHistory.length;
+    // Logic
+    this.guess = function(number) {
+      validateGuess(number);
+
+      var result = {
+        'value': number,
+        'correct': this.getSecretNumber() === number
+      };
+
+      // If the answer is correct
+      if (result.correct) {
+        winLose = 'win';
+        result['description'] = 'You win!';
+
+        userGuessHistory.push(result);
+
+        return result;
+      }
+
+      // If it is not correct
+      // check if it is the last guess
+      // lose the game
+      if (this.getUserGuessHistory().length === this.getMaxGuessCount() - 1) {
+        winLose = 'lose';
+        result['description'] = 'You lose!';
+
+        userGuessHistory.push(result);
+
+        return result;
+      }
+
+      var temperature = calculateTemperature(number, this.getSecretNumber());
+      var guessIsHigherThanAnswer = number > this.getSecretNumber();
+      var description = "You are " + temperature + ".";
+
+      if (guessIsHigherThanAnswer) {
+        description += " You need to guess lower.";
+      } else {
+        description += " You need to guess higher.";
+      }
+
+      result['description'] = description;
+
+      userGuessHistory.push(result);
+
+      return result;
     };
 
-    this.validateGuess = function(number) {
-      if (win) {
+    this.surrender = function() {
+      winLose = 'lose';
+
+      return this.getSecretNumber();
+    };
+  
+    var validateGuess = (function(number) {
+      if (this.getWinLose() === 'lose') {
+        throw new Error("You already lost!");
+      }
+
+      if (this.getWinLose() === 'win') {
         throw new Error("You already won!");
       }
 
@@ -41,52 +95,19 @@ var Game = (function() {
         throw new Error("Input must be between 1 and 100!");
       }
 
-      if (getIndex(userGuessHistory, number) > -1) {
+      if (getIndex(this.getUserGuessHistory(), number) > -1) {
         throw new Error("You already tried that number. Try again!");
       }
-
-      if (this.getUserGuessHistory().length >= this.getMaxGuessCount()) {
-        throw new Error("Max number of guess reached!");
-      }
-    };
-
-    this.guess = function(number) {
-       var result = {};
-
-       try {
-         this.validateGuess(number);
-       } catch(e) {
-         result['description'] = e;
-         result[correct] = false;
-
-         return result;
-       }
-
-       var temperature = this.calculateTemperature(number);
-       var correct = this.getSecretNumber() === number;
-
-       var guessIsHigherThanAnswer = number > this.getSecretNumber();
-
-       result['value'] = number;
-       result['correct'] = correct;
-       result['description'] = correct ? "You win!" : "You are " + temperature + ".";
-
-       if (!correct) {
-         result['description'] += number > this.getSecretNumber ? " You need to guess lower." : " You need to guess higher."; 
-       }
-
-       userGuessHistory.push(result);
-
-       if (correct) {
-         win = true;
-       }
-
-       return result;
-     };
+    }).bind(this);
   };
 
-  Game.prototype.calculateTemperature = function(number) {
-    var distance = Math.abs(number - this.getSecretNumber());
+  Game.prototype.guessLeftCount = function() {
+    return this.getMaxGuessCount() - this.getUserGuessHistory().length;
+  };
+
+  // ======== Helpers
+  function calculateTemperature(numA, numB) {
+    var distance = Math.abs(numA - numB);
 
     if (distance >= 0 && distance < 25) {
       return "fiery hot";
@@ -103,9 +124,8 @@ var Game = (function() {
     if (distance >= 75 && distance <= 100) {
       return "ice cold";
     }
-  };
- 
-  // ======== Helper
+  }
+
   function getIndex(arr, number) {
     for (var i = 0; i < arr.length; i++) {
       if (arr[i].value === number) {
