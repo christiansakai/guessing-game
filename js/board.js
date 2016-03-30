@@ -87,7 +87,7 @@ var Board = (function($) {
     return "<div class='row'>" +
               "<div class='col-xs-7 col-md-8'>" +
                 "<h2 class='text-center title game-title'>" +
-                   "Hot or Cold<small>guessing game</small>" + 
+                   "Hot or Cold <small>guessing game</small>" + 
                 "</h2>" +
               "</div>" +
               "<div class='col-xs-5 col-md-4'>" +
@@ -125,7 +125,7 @@ var Board = (function($) {
   function addTemperatureAndAltitudeIconToSentence(sentence) {
     var icons = {
       hot: 'fire',
-      cold: 'ice-lolly',
+      cold: 'asterisk',
       higher: 'upload',
       lower: 'download'
     };

@@ -14,7 +14,7 @@ describe("Board", function() {
     var renderedHead = "<div class='row'>" +
               "<div class='col-xs-7 col-md-8'>" +
                 "<h2 class='text-center title game-title'>" +
-                   "Hot or Cold<small>guessing game</small>" + 
+                   "Hot or Cold <small>guessing game</small>" + 
                 "</h2>" +
               "</div>" +
               "<div class='col-xs-5 col-md-4'>" +
@@ -40,13 +40,12 @@ describe("Board", function() {
               "</form>" +
             "</div>";
 
-      spyOn($.prototype, 'append');
+      spyOn($.fn, 'html');
       spyOn($.prototype, 'find');
 
       board.setupBoard();
       
-      expect($.prototype.append).toHaveBeenCalledWith(renderedHead);
-      expect($.prototype.append).toHaveBeenCalledWith(renderedBody);
+      expect($.prototype.html).toHaveBeenCalledWith(renderedHead + renderedBody);
       expect($.prototype.find).toHaveBeenCalledWith('#game-hint');
       expect($.prototype.find).toHaveBeenCalledWith('#game-replay');
       expect($.prototype.find).toHaveBeenCalledWith('#game-input');
@@ -123,7 +122,7 @@ describe("Board", function() {
 
       board.renderSummary(description, guessCountLeft, guessCountSoFar);
 
-    var expectedHTML = "You are cold <span class='glyphicon glyphicon-ice-lolly'></span>. You need to guess higher <span class='glyphicon glyphicon-upload'></span>." + " " +
+    var expectedHTML = "You are cold <span class='glyphicon glyphicon-asterisk'></span>. You need to guess higher <span class='glyphicon glyphicon-upload'></span>." + " " +
                       "You have 0 counts left." + " " +
                       "4 counts so far.";
 
@@ -165,7 +164,7 @@ describe("Board", function() {
 
       board.renderSummary(description, guessCountLeft, guessCountSoFar);
 
-    var expectedHTML = "You are ice cold <span class='glyphicon glyphicon-ice-lolly'></span><span class='glyphicon glyphicon-ice-lolly'></span>. You need to guess lower <span class='glyphicon glyphicon-download'></span>." + " " +
+    var expectedHTML = "You are ice cold <span class='glyphicon glyphicon-asterisk'></span><span class='glyphicon glyphicon-asterisk'></span>. You need to guess lower <span class='glyphicon glyphicon-download'></span>." + " " +
                       "You have 1 counts left." + " " +
                       "4 counts so far.";
 

@@ -19,6 +19,13 @@ $(document).ready(function() {
 
     view.setupBoard();
 
+    view.listenToEvents({
+      replay: startGame,
+      guess: guess,
+      hint: hint
+    });
+
+
     // Check answer for debugging purposes
     console.log("Answer is ", secretNumber);
   };
@@ -56,11 +63,4 @@ $(document).ready(function() {
 
     view.disableControls();
   }
-
-  view.listenToEvents({
-    replay: startGame,
-    guess: guess,
-    hint: hint
-  });
-
 });

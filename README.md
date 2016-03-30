@@ -37,6 +37,5 @@ Made jQuery custom functions to make DOM object visible, invisible or toggle bet
 
 ## TODO
 
-glyphicon lolly
 
 append change to html and testing, and probaby test on $.fn.init
