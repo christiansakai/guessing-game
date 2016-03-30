@@ -34,3 +34,9 @@ All DOM primitive type will have this syntax `dom['input']`, while all DOM funct
 
 #Etc
 Made jQuery custom functions to make DOM object visible, invisible or toggle between visibilities.
+
+## TODO
+
+glyphicon lolly
+
+append change to html and testing, and probaby test on $.fn.init

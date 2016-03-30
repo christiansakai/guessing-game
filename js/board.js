@@ -68,8 +68,7 @@ var Board = (function($) {
       var header = renderHeader();
       var body = renderBody(this.getMaxGuessCount());
 
-      boardElement.append(header);
-      boardElement.append(body);
+      boardElement.html(header + body);
     }).bind(this);
 
     function initializeSelectors() {

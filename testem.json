@@ -3,6 +3,8 @@
     "src_files": [
       "http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js",
       "js/game.js",
-      "js/gameSpec.js"
+      "js/gameSpec.js",
+      "js/board.js",
+      "js/boardSpec.js"
     ]
 }
